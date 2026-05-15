@@ -358,7 +358,7 @@ function MethodSelector({ value, onChange, th }) {
   }, [])
   const c = METHOD_COLORS[value] || METHOD_COLORS.GET
   return (
-    <div ref={ref} className='relative flex-shrink-0'>
+    <div ref={ref} className='relative shrink-0'>
       <button
         onClick={() => setOpen((o) => !o)}
         className={`flex items-center gap-2 px-3 py-2 rounded-lg border ${c.bg} ${c.border} ${c.tw} font-mono font-bold text-xs tracking-widest hover:brightness-110 transition-all`}
@@ -832,7 +832,7 @@ export default function QuickAPIStudio() {
       >
         {/* ── Col 1: Profiles + Requests ── */}
         <aside
-          className='qa-tr w-56 flex flex-col flex-shrink-0 overflow-hidden'
+          className='qa-tr w-56 flex flex-col shrink-0 overflow-hidden'
           style={{
             background: th.bgAlt,
             borderRight: `1px solid ${th.border}`
@@ -920,7 +920,7 @@ export default function QuickAPIStudio() {
                     ) : (
                       <>
                         <div
-                          className='w-2 h-2 rounded-full flex-shrink-0'
+                          className='w-2 h-2 rounded-full shrink-0'
                           style={{
                             background: isActive ? '#3b82f6' : th.border4
                           }}
@@ -979,7 +979,7 @@ export default function QuickAPIStudio() {
                             onClick={() => setActiveRequestId(req.id)}
                           >
                             <span
-                              className={`text-[9px] font-bold font-mono ${mc.tw} w-10 flex-shrink-0`}
+                              className={`text-[9px] font-bold font-mono ${mc.tw} w-10 shrink-0`}
                             >
                               {req.method}
                             </span>
@@ -1022,7 +1022,7 @@ export default function QuickAPIStudio() {
 
         {/* ── Col 2: Config ── */}
         <div
-          className='qa-tr w-72 flex flex-col flex-shrink-0 overflow-hidden'
+          className='qa-tr w-72 flex flex-col shrink-0 overflow-hidden'
           style={{
             background: th.bgPanel,
             borderRight: `1px solid ${th.border}`
@@ -1197,7 +1197,7 @@ export default function QuickAPIStudio() {
                       />
                       <button
                         onClick={() => removeHeader(h.id)}
-                        className='text-red-500 flex-shrink-0 p-1'
+                        className='text-red-500 shrink-0 p-1'
                       >
                         <Trash2 size={10} />
                       </button>
@@ -1360,7 +1360,7 @@ export default function QuickAPIStudio() {
 
         {/* ── Col 4: Response ── */}
         <div
-          className='qa-tr w-96 flex flex-col flex-shrink-0 overflow-hidden'
+          className='qa-tr w-96 flex flex-col shrink-0 overflow-hidden'
           style={{ background: th.bgAlt }}
         >
           <div
@@ -1482,7 +1482,7 @@ export default function QuickAPIStudio() {
                 <div className='flex items-start gap-2 p-3 rounded-lg bg-red-500/10 border border-red-500/20'>
                   <AlertTriangle
                     size={13}
-                    className='text-red-500 mt-0.5 flex-shrink-0'
+                    className='text-red-500 mt-0.5 shrink-0'
                   />
                   <div>
                     <p className='text-[10px] text-red-500 font-bold mb-1'>
@@ -1500,7 +1500,7 @@ export default function QuickAPIStudio() {
                   <div className='flex items-start gap-2 p-3 rounded-lg bg-amber-500/10 border border-amber-500/20'>
                     <AlertCircle
                       size={13}
-                      className='text-amber-500 mt-0.5 flex-shrink-0'
+                      className='text-amber-500 mt-0.5 shrink-0'
                     />
                     <p className='text-[10px] text-amber-500 leading-relaxed'>
                       {t.corsNote}
@@ -1599,7 +1599,7 @@ export default function QuickAPIStudio() {
                       />
                     </div>
                     <pre
-                      className='p-3 text-[10px] leading-5 font-mono overflow-x-auto whitespace-pre-wrap break-words max-h-64'
+                      className='p-3 text-[10px] leading-5 font-mono overflow-x-auto whitespace-pre-wrap wrap-break-word max-h-64'
                       style={{ color: th.jsonResult }}
                     >
                       {prettyBody}
@@ -1631,7 +1631,7 @@ export default function QuickAPIStudio() {
                       {Object.entries(response.headers).map(([k, v]) => (
                         <div key={k} className='flex gap-2'>
                           <span
-                            className='flex-shrink-0'
+                            className='shrink-0'
                             style={{ color: th.textDim, minWidth: '10rem' }}
                           >
                             {k}:
