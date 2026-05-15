@@ -1652,6 +1652,33 @@ export default function QuickAPIStudio() {
           </div>
         </div>
       </div>
+      <footer
+        className='qa-tr px-5 py-2 flex items-center justify-between shrink-0'
+        style={{
+          background: th.bg,
+          borderTop: `1px solid ${th.border}`,
+          zIndex: 50
+        }}
+      >
+        <div className='flex items-center gap-4'>
+          <span className='text-[10px]' style={{ color: th.textDimmest }}>
+            © 2026 QuickAPI Studio
+          </span>
+          <div className='flex items-center gap-1'>
+            <span className='text-[10px]' style={{ color: th.textDimmest }}>
+              {lang === 'en' ? 'Created by' : 'Creado por'}
+              <span className='font-bold ml-1'>Josmer Uriel Bertel Calle</span>
+            </span>
+            <Zap size={10} className='text-blue-500 ml-1' />
+          </div>
+        </div>
+        <span
+          className='text-[10px] font-mono'
+          style={{ color: th.textDimmest }}
+        >
+          Enero 2026
+        </span>
+      </footer>
     </div>
   )
 }
