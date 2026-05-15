@@ -47,7 +47,7 @@ const T = {
     headers: 'Request Headers',
     addHeader: 'Add header',
     requestBody: 'Request Body',
-    bodyNotRequired: "GET requests don't require a body",
+    bodyOptional: 'Body is optional for this method',
     saveRequest: 'Save Request',
     saved: 'Saved!',
     responseBody: 'Response',
@@ -79,7 +79,7 @@ const T = {
     noResponse: 'No response yet',
     keyPlaceholder: 'Header-Name',
     valuePlaceholder: 'value',
-    fullUrl: 'Full URL',
+    delay: 'Send Delay',
     pretty: 'Pretty',
     raw: 'Raw'
   },
@@ -101,7 +101,7 @@ const T = {
     headers: 'Cabeceras de Petición',
     addHeader: 'Agregar cabecera',
     requestBody: 'Cuerpo de la Petición',
-    bodyNotRequired: 'Las peticiones GET no requieren cuerpo',
+    bodyOptional: 'El cuerpo es opcional para este método',
     saveRequest: 'Guardar Petición',
     saved: '¡Guardado!',
     responseBody: 'Respuesta',
@@ -133,7 +133,7 @@ const T = {
     noResponse: 'Sin respuesta aún',
     keyPlaceholder: 'Nombre-Cabecera',
     valuePlaceholder: 'valor',
-    fullUrl: 'URL Completa',
+    delay: 'Retardo de Envío',
     pretty: 'Formateado',
     raw: 'Sin formato'
   }
@@ -146,46 +146,46 @@ const THEME = {
     bg: '#0e0e0e',
     bgAlt: '#0c0c0c',
     bgPanel: '#0f0f0f',
-    bgInput: '#151515',
-    bgCode: '#111111',
-    bgLineNum: '#0a0a0a',
-    border: '#1a1a1a',
-    border2: '#1e1e1e',
-    border3: '#252525',
-    border4: '#2a2a2a',
-    textPrimary: '#ffffff',
-    textSec: '#cccccc',
-    textMuted: '#888888',
-    textDim: '#555555',
-    textDimmer: '#444444',
-    textDimmest: '#333333',
-    jsonText: '#d4d4d4',
-    jsonResult: '#a8d8a8',
-    hoverBg: 'rgba(255,255,255,0.05)',
-    hoverBg2: 'rgba(255,255,255,0.08)',
+    bgInput: '#1a1a1a',
+    bgCode: '#141414',
+    bgLineNum: '#111111',
+    border: '#222222',
+    border2: '#252525',
+    border3: '#2e2e2e',
+    border4: '#383838',
+    textPrimary: '#f0f0f0',
+    textSec: '#d8d8d8',
+    textMuted: '#b0b0b0',
+    textDim: '#f0f0f0',
+    textDimmer: '#6a6a6a',
+    textDimmest: '#505050',
+    jsonText: '#e0e0e0',
+    jsonResult: '#7fd6a0',
+    hoverBg: 'rgba(255,255,255,0.06)',
+    hoverBg2: 'rgba(255,255,255,0.1)',
     dropdownBg: '#1a1a1a'
   },
   light: {
-    bg: '#f4f4f5',
-    bgAlt: '#ececed',
-    bgPanel: '#f8f8f9',
+    bg: '#f0f0f2',
+    bgAlt: '#e8e8ea',
+    bgPanel: '#f5f5f7',
     bgInput: '#ffffff',
-    bgCode: '#fafafa',
-    bgLineNum: '#e5e5e7',
-    border: '#e0e0e2',
-    border2: '#d8d8da',
-    border3: '#ccccce',
-    border4: '#c0c0c2',
-    textPrimary: '#111111',
-    textSec: '#2a2a2a',
-    textMuted: '#555555',
-    textDim: '#777777',
-    textDimmer: '#999999',
-    textDimmest: '#bbbbbb',
-    jsonText: '#1e1e2e',
-    jsonResult: '#1a5c3a',
-    hoverBg: 'rgba(0,0,0,0.04)',
-    hoverBg2: 'rgba(0,0,0,0.07)',
+    bgCode: '#f8f8fa',
+    bgLineNum: '#e0e0e2',
+    border: '#d4d4d6',
+    border2: '#cacaca',
+    border3: '#bcbcbe',
+    border4: '#ababac',
+    textPrimary: '#0a0a0a',
+    textSec: '#1c1c1c',
+    textMuted: '#3a3a3a',
+    textDim: '#0a0a0a',
+    textDimmer: '#777777',
+    textDimmest: '#999999',
+    jsonText: '#12121e',
+    jsonResult: '#145c35',
+    hoverBg: 'rgba(0,0,0,0.05)',
+    hoverBg2: 'rgba(0,0,0,0.09)',
     dropdownBg: '#ffffff'
   }
 }
@@ -260,7 +260,7 @@ function formatBytes(bytes) {
   return `${(bytes / 1024).toFixed(1)} KB`
 }
 
-const NO_BODY_METHODS = ['GET', 'HEAD', 'OPTIONS']
+const NO_BODY_METHODS = [] // body is always optional regardless of method
 
 const DEFAULT_JSON = `{
   "key": "value"
@@ -479,7 +479,7 @@ export default function QuickAPIStudio() {
   const [jsonBody, setJsonBody] = useState(DEFAULT_JSON)
   const [requestName, setRequestName] = useState('')
 
-  // Response
+  const [delay, setDelay] = useState(0)
   const [isSending, setIsSending] = useState(false)
   const [response, setResponse] = useState(null) // { status, statusText, headers, body, time, size, error, isCors }
   const [responseView, setResponseView] = useState('pretty') // pretty | raw
@@ -490,8 +490,8 @@ export default function QuickAPIStudio() {
   const needsBody = !NO_BODY_METHODS.includes(method)
   const isJsonValid = isJson(jsonBody)
   const fullUrl = buildFullUrl(baseUrl, path)
-  const canSend =
-    isValidUrl(fullUrl) && (!needsBody || isJsonValid || jsonBody.trim() === '')
+  // Body is always optional - only block if there IS a body and it's invalid JSON
+  const canSend = isValidUrl(fullUrl) && (jsonBody.trim() === '' || isJsonValid)
 
   const activeProfile = profiles.find((p) => p.id === activeProfileId)
   const activeRequest = activeProfile?.requests?.find(
@@ -634,6 +634,9 @@ export default function QuickAPIStudio() {
     setResponse(null)
 
     const start = Date.now()
+
+    // Apply configured delay before sending
+    if (delay > 0) await new Promise((r) => setTimeout(r, delay))
     const headers = {}
 
     // Add custom headers
@@ -641,9 +644,8 @@ export default function QuickAPIStudio() {
       if (h.enabled && h.key.trim()) headers[h.key.trim()] = h.value
     })
 
-    // Auto content-type for body requests
+    // Auto content-type when body has content
     if (
-      needsBody &&
       jsonBody.trim() &&
       !headers['Content-Type'] &&
       !headers['content-type']
@@ -652,7 +654,7 @@ export default function QuickAPIStudio() {
     }
 
     const fetchOpts = { method, headers }
-    if (needsBody && jsonBody.trim()) {
+    if (jsonBody.trim()) {
       fetchOpts.body = jsonBody
     }
 
@@ -750,7 +752,19 @@ export default function QuickAPIStudio() {
         .qa-pdot { animation: qa-pdot 1s infinite; }
         .qa-hover:hover { background: ${th.hoverBg} !important; }
         .qa-tr { transition: background 0.2s, color 0.2s, border-color 0.2s; }
-        input::placeholder, textarea::placeholder { color: ${th.textDimmer}; }
+        .latency-slider {
+          -webkit-appearance: none; appearance: none; height: 4px;
+          background: linear-gradient(to right, #3b82f6 0%, #3b82f6 var(--prog, 0%), ${th.border4} var(--prog, 0%), ${th.border4} 100%);
+          border-radius: 2px; outline: none; width: 100%;
+        }
+        .latency-slider::-webkit-slider-thumb {
+          -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%;
+          background: #3b82f6; cursor: pointer; border: 2px solid ${th.bg}; box-shadow: 0 0 0 2px #3b82f633;
+        }
+        .latency-slider::-moz-range-thumb {
+          width: 14px; height: 14px; border-radius: 50%; background: #3b82f6;
+          cursor: pointer; border: 2px solid ${th.bg};
+        }
         input:focus, textarea:focus { outline: none; border-color: rgba(59,130,246,0.5) !important; }
       `}</style>
 
@@ -1192,6 +1206,62 @@ export default function QuickAPIStudio() {
                 </div>
               </div>
 
+              {/* Send Delay */}
+              <div className='space-y-2'>
+                <div className='flex items-center justify-between'>
+                  <label
+                    className='text-[10px] uppercase tracking-widest'
+                    style={labelStyle}
+                  >
+                    {t.delay}
+                  </label>
+                  <div
+                    className='flex items-center gap-1 px-2 py-0.5 rounded-full'
+                    style={{
+                      background: th.bgInput,
+                      border: `1px solid ${th.border3}`
+                    }}
+                  >
+                    <span
+                      className={`text-xs font-bold ${delay > 3000 ? 'text-red-500' : delay > 1000 ? 'text-amber-500' : delay > 0 ? 'text-blue-400' : 'text-emerald-500'}`}
+                    >
+                      {delay}
+                    </span>
+                    <span
+                      className='text-[10px]'
+                      style={{ color: th.textDimmer }}
+                    >
+                      ms
+                    </span>
+                  </div>
+                </div>
+                <input
+                  type='range'
+                  min={0}
+                  max={5000}
+                  step={50}
+                  value={delay}
+                  onChange={(e) => {
+                    const v = Number(e.target.value)
+                    setDelay(v)
+                    e.target.style.setProperty('--prog', `${(v / 5000) * 100}%`)
+                  }}
+                  ref={(el) => {
+                    if (el)
+                      el.style.setProperty('--prog', `${(delay / 5000) * 100}%`)
+                  }}
+                  className='latency-slider w-full cursor-pointer'
+                />
+                <div
+                  className='flex justify-between text-[9px]'
+                  style={{ color: th.textDimmer }}
+                >
+                  <span>0ms</span>
+                  <span>2500ms</span>
+                  <span>5000ms</span>
+                </div>
+              </div>
+
               {/* Save */}
               <button
                 onClick={saveRequest}
@@ -1230,67 +1300,62 @@ export default function QuickAPIStudio() {
                 {t.requestBody}
               </span>
             </div>
-            {needsBody && jsonBody.trim() && (
-              <div
-                className={`flex items-center gap-1.5 px-2 py-1 rounded-full text-[9px] font-bold tracking-widest border ${isJsonValid ? 'text-emerald-500 bg-emerald-500/10 border-emerald-500/20' : 'text-red-500 bg-red-500/10 border-red-500/20'}`}
-              >
-                {isJsonValid ? (
-                  <CheckCircle2 size={9} />
-                ) : (
-                  <AlertCircle size={9} />
-                )}
-                {isJsonValid ? t.validJson : t.invalidJson}
-              </div>
-            )}
+            <div className='flex items-center gap-2'>
+              {!needsBody && (
+                <span
+                  className='text-[9px] italic'
+                  style={{ color: th.textDimmer }}
+                >
+                  {t.bodyOptional}
+                </span>
+              )}
+              {jsonBody.trim() && (
+                <div
+                  className={`flex items-center gap-1.5 px-2 py-1 rounded-full text-[9px] font-bold tracking-widest border ${isJsonValid ? 'text-emerald-500 bg-emerald-500/10 border-emerald-500/20' : 'text-red-500 bg-red-500/10 border-red-500/20'}`}
+                >
+                  {isJsonValid ? (
+                    <CheckCircle2 size={9} />
+                  ) : (
+                    <AlertCircle size={9} />
+                  )}
+                  {isJsonValid ? t.validJson : t.invalidJson}
+                </div>
+              )}
+            </div>
           </div>
 
-          {!needsBody ? (
-            <div className='flex-1 flex items-center justify-center'>
-              <div className='text-center px-6'>
-                <Hash
-                  size={28}
-                  className='mx-auto mb-3'
+          <div className='flex-1 overflow-hidden relative'>
+            {/* Line numbers */}
+            <div
+              className='absolute left-0 top-0 bottom-0 w-10 overflow-hidden pointer-events-none z-10 pt-4'
+              style={{
+                background: th.bgLineNum,
+                borderRight: `1px solid ${th.border}`
+              }}
+            >
+              {jsonBody.split('\n').map((_, i) => (
+                <div
+                  key={i}
+                  className='text-[10px] text-right pr-2.5 leading-6'
                   style={{ color: th.textDimmest }}
-                />
-                <p className='text-xs' style={{ color: th.textDimmer }}>
-                  {t.bodyNotRequired}
-                </p>
-              </div>
+                >
+                  {i + 1}
+                </div>
+              ))}
             </div>
-          ) : (
-            <div className='flex-1 overflow-hidden relative'>
-              {/* Line numbers */}
-              <div
-                className='absolute left-0 top-0 bottom-0 w-10 overflow-hidden pointer-events-none z-10 pt-4'
-                style={{
-                  background: th.bgLineNum,
-                  borderRight: `1px solid ${th.border}`
-                }}
-              >
-                {jsonBody.split('\n').map((_, i) => (
-                  <div
-                    key={i}
-                    className='text-[10px] text-right pr-2.5 leading-6'
-                    style={{ color: th.textDimmest }}
-                  >
-                    {i + 1}
-                  </div>
-                ))}
-              </div>
-              <textarea
-                value={jsonBody}
-                onChange={(e) => setJsonBody(e.target.value)}
-                className={`absolute inset-0 bg-transparent text-[12px] leading-6 pl-12 pr-4 pt-4 pb-4 font-mono w-full h-full border-0 ${needsBody && jsonBody.trim() && !isJsonValid ? 'shadow-[inset_2px_0_0_#ef4444]' : ''}`}
-                style={{
-                  color: th.jsonText,
-                  caretColor: '#3b82f6',
-                  outline: 'none'
-                }}
-                spellCheck={false}
-                placeholder={`{\n  "key": "value"\n}`}
-              />
-            </div>
-          )}
+            <textarea
+              value={jsonBody}
+              onChange={(e) => setJsonBody(e.target.value)}
+              className={`absolute inset-0 bg-transparent text-[12px] leading-6 pl-12 pr-4 pt-4 pb-4 font-mono w-full h-full border-0 ${jsonBody.trim() && !isJsonValid ? 'shadow-[inset_2px_0_0_#ef4444]' : ''}`}
+              style={{
+                color: th.jsonText,
+                caretColor: '#3b82f6',
+                outline: 'none'
+              }}
+              spellCheck={false}
+              placeholder={`{\n  "key": "value"\n} `}
+            />
+          </div>
         </div>
 
         {/* ── Col 4: Response ── */}
@@ -1365,7 +1430,7 @@ export default function QuickAPIStudio() {
                 Enter a valid URL to send
               </p>
             )}
-            {needsBody && jsonBody.trim() && !isJsonValid && (
+            {jsonBody.trim() && !isJsonValid && (
               <p className='text-[10px] text-red-500 mt-1.5 text-center'>
                 {t.fixJson}
               </p>
