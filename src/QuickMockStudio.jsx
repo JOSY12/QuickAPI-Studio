@@ -1676,7 +1676,7 @@ export default function QuickAPIStudio() {
           className='text-[10px] font-mono'
           style={{ color: th.textDimmest }}
         >
-          Enero 2026
+          mayo 2026
         </span>
       </footer>
     </div>
